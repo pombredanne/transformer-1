@@ -19,7 +19,8 @@ PREDEFINED_DATE_FORMATS = [
     'MM/DD/YY',
     'DD-MM-YYYY',
     'DD/MM/YYYY',
-    'DD/MM/YY'
+    'DD/MM/YY',
+    'X'
 ]
 
 class DateFormattingTransform(BaseTransform):
@@ -34,7 +35,7 @@ class DateFormattingTransform(BaseTransform):
 
     def transform(self, date_value, from_format=u'', to_format=u'', from_timezone=u'', to_timezone=u'', **kwargs):
         if not date_value:
-            return date_value
+            return u''
 
         if not to_timezone:
             to_timezone = u'UTC'

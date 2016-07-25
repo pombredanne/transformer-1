@@ -1,7 +1,7 @@
 import arrow
 
 from transformer.registry import register
-from transformer.util import try_parse_date, tdelta
+from transformer.util import try_parse_date, tdelta, shift_date
 from transformer.transforms.base import BaseTransform
 from transformer.transforms.date.formatting import PREDEFINED_DATE_FORMATS
 
@@ -16,13 +16,21 @@ class DateManipulateTransform(BaseTransform):
     verb = 'manipulate'
 
     def transform(self, date_value, expression=u'', from_format=u'', to_format=u'', **kwargs):
+        if date_value is None:
+            date_value = u''
+
         delta = tdelta(expression)
 
         dt = try_parse_date(date_value, from_format=from_format)
         if not dt:
             return self.raise_exception('Date could not be parsed')
 
-        return arrow.get(dt).to('utc').replace(**delta).format(to_format)
+        dt = shift_date(dt, delta)
+        if not dt:
+            return self.raise_exception('Date could not be manipulated')
+
+        return arrow.get(dt).to('utc').format(to_format)
+
 
     def fields(self, *args, **kwargs):
         dt = arrow.get(try_parse_date('Mon Jan 22 15:04:05 -0800 2006')).to('utc')
